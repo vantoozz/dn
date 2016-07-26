@@ -7,4 +7,4 @@ php:
   - hhvm
 
 script:
-  - php breathalyzer.php 187 1
+  - php breathalyzer.php 187 2
