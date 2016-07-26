@@ -83,7 +83,11 @@ foreach ($inputText as $inputWord) {
 
 if (isset($argv[2])) {
     echo memory_get_peak_usage(true) . "\n";
-    echo microtime(true) - $start . "\n";
+    $time = microtime(true) - $start;
+    echo $time . "\n";
+    if ($time > 1) {
+        throw new RuntimeException('Too slow');
+    }
 }
 
 echo $totalDistance . "\n";
