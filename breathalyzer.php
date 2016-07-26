@@ -85,7 +85,7 @@ if (isset($argv[2])) {
     echo memory_get_peak_usage(true) . "\n";
     $time = microtime(true) - $start;
     echo $time . "\n";
-    if ($time > 1) {
+    if ($time > 3) {
         throw new RuntimeException('Too slow');
     }
 }
