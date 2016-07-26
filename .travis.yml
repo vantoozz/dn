@@ -1,5 +1,8 @@
 language: php
 
+before_script:
+  - phpenv config-rm xdebug.ini
+
 php:
   - 5.5
   - 5.6
