@@ -20,6 +20,8 @@ while (!$file->eof()) {
     $lengths[$length] = $length;
 }
 
+unset($vocabulary[0], $lengths[0]);
+
 $file = null;
 
 $totalDistance = 0;
