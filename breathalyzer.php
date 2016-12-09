@@ -106,10 +106,10 @@ function findMinDistance(array $vocabulary, $inputWord)
     foreach ($vocabulary as $word) {
         $distance = levenshtein($word, $inputWord);
         if ($distance < $min) {
+            $min = $distance;
             if (1 === $min) {
                 return $min;
             }
-            $min = $distance;
         }
     }
 
