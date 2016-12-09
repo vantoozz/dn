@@ -84,7 +84,7 @@ foreach ($inputText as $inputWord) {
 }
 
 if (isset($argv[2])) {
-    echo memory_get_peak_usage(true) . "\n";
+    echo round(memory_get_peak_usage(true)/(1024 * 1024)) . "Mb\n";
     $time = microtime(true) - $start;
     echo $time . "\n";
     if ($time > 3) {
