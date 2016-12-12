@@ -30,10 +30,6 @@ $lengthsCount = count($lengths);
 $cache = [];
 
 foreach ($inputText as $inputWord) {
-    if ('' === $inputWord) {
-        continue;
-    }
-
     /** @noinspection UnSafeIsSetOverArrayInspection */
     if (isset($cache[$inputWord])) {
         $totalDistance += $cache[$inputWord];
@@ -49,14 +45,10 @@ foreach ($inputText as $inputWord) {
     $amplitude = 1;
     $possibleMin = 1;
     $lengthsToCheck = $lengthsCount;
-    $odd = true;
     $searchLength = $wordLength;
     $min = PHP_INT_MAX;
 
-    do {
-        if ($min <= $possibleMin) {
-            break;
-        }
+    while ($min > $possibleMin) {
 
         if (isset($vocabulary[$searchLength])) {
             $minDistance = findMinDistance($vocabulary[$searchLength], $inputWord, $possibleMin);
@@ -67,18 +59,21 @@ foreach ($inputText as $inputWord) {
                 }
             }
             $lengthsToCheck--;
+
+            if (0 >= $lengthsToCheck) {
+                break;
+            }
         }
 
-        if ($odd) {
-            $searchLength = $wordLength - $amplitude;
-        } else {
-            $searchLength = $wordLength + $amplitude;
+        $amplitude = -$amplitude;
+
+        $searchLength = $wordLength + $amplitude;
+        $possibleMin = abs($wordLength - $searchLength);
+
+        if (0 < $amplitude) {
             $amplitude++;
         }
-        $possibleMin = abs($wordLength - $searchLength);
-        $odd = !$odd;
-
-    } while ($lengthsToCheck);
+    }
 
     $cache[$inputWord] = $min;
 
