@@ -47,6 +47,7 @@ foreach ($inputText as $inputWord) {
     }
 
     $amplitude = 1;
+    $possibleMin = 1;
     $lengthsToCheck = $lengthsCount;
     $odd = true;
     $searchLength = $wordLength;
@@ -58,10 +59,10 @@ foreach ($inputText as $inputWord) {
         }
 
         if (isset($vocabulary[$searchLength])) {
-            $minDistance = findMinDistance($vocabulary[$searchLength], $inputWord);
+            $minDistance = findMinDistance($vocabulary[$searchLength], $inputWord, $possibleMin);
             if ($minDistance < $min) {
                 $min = $minDistance;
-                if (1 === $min) {
+                if ($amplitude === $min) {
                     break;
                 }
             }
@@ -73,6 +74,7 @@ foreach ($inputText as $inputWord) {
         } else {
             $searchLength = $wordLength + $amplitude;
             $amplitude++;
+            $possibleMin = max(1, $amplitude - 1);
         }
         $odd = !$odd;
 
@@ -97,9 +99,10 @@ echo $totalDistance . "\n";
 /**
  * @param array $vocabulary
  * @param string $inputWord
+ * @param int $possibleMin
  * @return int
  */
-function findMinDistance(array $vocabulary, $inputWord)
+function findMinDistance(array $vocabulary, $inputWord, $possibleMin)
 {
     $min = PHP_INT_MAX;
 
@@ -107,7 +110,7 @@ function findMinDistance(array $vocabulary, $inputWord)
         $distance = levenshtein($word, $inputWord);
         if ($distance < $min) {
             $min = $distance;
-            if (1 === $min) {
+            if ($possibleMin === $min) {
                 return $min;
             }
         }
