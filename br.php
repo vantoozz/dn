@@ -58,7 +58,6 @@ foreach ($inputText as $inputWord) {
                     break;
                 }
             }
-//            $lengthsToCheck--;
 
             if (!--$lengthsToCheck) {
                 break;
