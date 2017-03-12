@@ -10,4 +10,4 @@ php:
   - 7.1
 
 script:
-  - php br.php 187 2
+  - php br.php 187

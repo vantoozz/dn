@@ -2,6 +2,17 @@
 
 $start = microtime(true);
 
+$accuracy = 100;
+if (isset($argv[2])) {
+    $accuracy = (int)$argv[2];
+    if (1 > $accuracy || 100 < $accuracy) {
+        throw new InvalidArgumentException('Accuracy must be between 1 and 100');
+    }
+}
+
+$accuracy /= 100;
+
+
 $inputFile = new SplFileObject($argv[1]);
 $inputFile->setFlags(SplFileObject::DROP_NEW_LINE);
 $inputText = explode(' ', mb_strtoupper($inputFile->fgets()));
@@ -41,19 +52,23 @@ foreach ($inputText as $inputWord) {
         continue;
     }
 
+    $deviation = $wordLength - $wordLength * $accuracy;
+
     $amplitude = 1;
     $possibleMin = 1;
+    $satisfiableMin = $possibleMin + $deviation;
     $lengthsToCheck = $lengthsCount;
     $searchLength = $wordLength;
     $min = PHP_INT_MAX;
 
-    while ($min > $possibleMin) {
+    while ($min > $satisfiableMin) {
+
 
         if (isset($vocabulary[$searchLength])) {
-            $minDistance = findMinDistance($vocabulary[$searchLength], $inputWord, $possibleMin);
+            $minDistance = findMinDistance($vocabulary[$searchLength], $inputWord, $satisfiableMin);
             if ($minDistance < $min) {
                 $min = $minDistance;
-                if ($possibleMin === $min) {
+                if ($min <= $satisfiableMin) {
                     break;
                 }
             }
@@ -66,36 +81,37 @@ foreach ($inputText as $inputWord) {
         $amplitude = -$amplitude;
 
         $searchLength = $wordLength + $amplitude;
-        $possibleMin = abs($wordLength - $searchLength);
+        $possibleMin = abs($wordLength - $searchLength) + $deviation;
+        $satisfiableMin = $possibleMin + $deviation;
 
         if (0 < $amplitude) {
             $amplitude++;
         }
     }
 
-    $cache[$inputWord] = $min;
+    $distance = $min;
 
-    $totalDistance += $min;
-}
-
-if (isset($argv[2])) {
-    echo round(memory_get_peak_usage(true)/(1024 * 1024)) . "Mb\n";
-    $time = microtime(true) - $start;
-    echo $time . "\n";
-    if ($time > 3) {
-      //  throw new RuntimeException('Too slow');
+    if ($deviation > 0 && $possibleMin < $min) {
+        $avg = random_int($possibleMin * 100, $min * 100) / 100;
+        $distance = $possibleMin + ($avg - $possibleMin) * $accuracy;
     }
+
+    $cache[$inputWord] = $distance;
+
+    $totalDistance += $distance;
 }
+
+$totalDistance = round($totalDistance);
 
 echo $totalDistance . "\n";
 
 /**
  * @param array $vocabulary
  * @param string $inputWord
- * @param int $possibleMin
+ * @param int $satisfiableMin
  * @return int
  */
-function findMinDistance(array $vocabulary, $inputWord, $possibleMin)
+function findMinDistance(array $vocabulary, $inputWord, $satisfiableMin)
 {
     $min = PHP_INT_MAX;
 
@@ -103,7 +119,7 @@ function findMinDistance(array $vocabulary, $inputWord, $possibleMin)
         $distance = levenshtein($word, $inputWord);
         if ($distance < $min) {
             $min = $distance;
-            if ($possibleMin === $min) {
+            if ($min <= $satisfiableMin) {
                 return $min;
             }
         }
