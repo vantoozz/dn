@@ -62,8 +62,6 @@ foreach ($inputText as $inputWord) {
     $min = PHP_INT_MAX;
 
     while ($min > $satisfiableMin) {
-
-
         if (isset($vocabulary[$searchLength])) {
             $minDistance = findMinDistance($vocabulary[$searchLength], $inputWord, $satisfiableMin);
             if ($minDistance < $min) {
